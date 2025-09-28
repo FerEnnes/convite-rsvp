@@ -39,7 +39,6 @@
     .small { font-size:12px; color:var(--muted); }
     .section-title { display:flex; align-items:center; justify-content:space-between; margin-bottom:8px;}
 
-    /* ===== Endereço estilizado ===== */
     .address-card{
       display:grid; grid-template-columns:auto 1fr; gap:12px;
       padding:14px; border:1px solid #e5e7eb; border-radius:12px; background:#fafafa
@@ -57,6 +56,8 @@
     }
     .map-btn:hover,.copy-btn:hover{background:#f8fafc}
     .deadline { background:#fff7ed; color:#9a3412; border:1px solid #fed7aa; padding:6px 10px; border-radius:10px; font-weight:600; font-size:12px;}
+    .deadline-wrap { margin-top:14px; }
+    .deadline { display:inline-block; }
   </style>
 </head>
 <body>
@@ -66,7 +67,6 @@
     </div>
 
     <div class="grid">
-      <!-- CARTÃO DO EVENTO -->
       <div class="card">
         <div class="section-title">
           <h1>Churrasco da Fer</h1>
@@ -77,7 +77,6 @@
           <span id="whenText"></span>
         </div>
 
-        <!-- Bloco de endereço estilizado -->
         <div class="event-line" style="align-items:stretch;">
           <strong style="margin-top:2px;">Onde:</strong>
           <div class="address-card">
@@ -102,16 +101,14 @@
         </div>
 
         <p class="muted">
-          Vai ter churrasco com opções <strong>veggie</strong> (milho, pão de alho, legumes na brasa). Traga sua boa energia! 🎉
+          Vai ter churrasco com carne e com opções <strong>veggie</strong> (abobrinha na brasa, queijo coalho e pão de alho). Traga sua fome! 🎉
         </p>
 
-        <!-- deadline gentil -->
-        <p class="muted">
+        <p class="muted deadline-wrap">
           <span class="deadline">⏰ Me dá um alô até <strong>02/10</strong> pra eu não errar a mão no pão de alho 😅</span>
         </p>
       </div>
 
-      <!-- FORMULÁRIO DE RSVP -->
       <div class="card">
         <h2>Confirmar presença</h2>
         <p class="muted">Preencha para eu organizar comida e bebida 🙂</p>
@@ -152,7 +149,6 @@
 
           <div class="msg" id="msg"></div>
 
-          <!-- Ações pós-envio: WhatsApp / E-mail -->
           <div id="share" class="actions" style="display:none;">
             <button type="button" id="whats" class="btn btn-outline">Enviar detalhes pelo WhatsApp</button>
             <button type="button" id="mail" class="btn btn-outline">Enviar detalhes por e-mail</button>
@@ -164,7 +160,6 @@
   </div>
 
   <script>
-    /* ===== Configs do evento / backend ===== */
     const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwVtMDkU1zA2jjsYmueA1No-wej944qJP6Oqf4VEj9yZ46MkWXYpHs9YkiYo6_EXeVZ/exec';
 
     const DATA_EVENTO = 'Sexta, 03/10/2025';
@@ -173,17 +168,14 @@
     const ENDERECO_COMPLETO = 'Rua São João, 431 - São Francisco de Assis, Camboriú - SC, 88340-000';
     const MAPS_URL = 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(ENDERECO_COMPLETO);
 
-    // Render do "Quando:"
     document.getElementById('whenText').textContent = `${DATA_EVENTO} — ${HORA_EVENTO}`;
 
-    // Ativar botões do bloco de endereço
     document.getElementById('btn-maps').href = MAPS_URL;
     document.getElementById('btn-copy').onclick = async () => {
       try { await navigator.clipboard.writeText(ENDERECO_COMPLETO); alert('Endereço copiado!'); }
       catch { alert('Não foi possível copiar.'); }
     };
 
-    // Mensagem que vai para WhatsApp/E-mail
     function msgConvite(nome, vai, acompanhantes) {
       const titulo = 'Churrasco da Fer';
       const quando = `${DATA_EVENTO} ${HORA_EVENTO}`;
@@ -195,8 +187,7 @@ Salão de festas (interfone 100)`;
       const presenca = vai === 'sim'
         ? `Presença confirmada${Number(acompanhantes||0) > 0 ? ` (+${acompanhantes})` : ''}!`
         : `Não poderei ir.`;
-
-      const lembrete = `P.S.: se ainda não respondeu, me dá um alô até ${DEADLINE} pra eu não exagerar no pão de alho 😅`;
+      const lembrete = `\n\nP.S.: se ainda não respondeu, me dá um alô até ${DEADLINE} pra eu não exagerar no pão de alho 😅`;
 
       return `🎉 ${titulo}
 ${quando}
@@ -205,8 +196,7 @@ ${contato}
 
 ${nome}: ${presenca}
 
-Obs.: opções vegetarianas garantidas 🌽🥖🥗
-${lembrete}`;
+Obs.: opções vegetarianas garantidas 🌽🥖🥗${lembrete}`;
     }
 
     async function enviar(payload) {
@@ -227,12 +217,10 @@ ${lembrete}`;
 
     function setupShare(nome, vai, acompanhantes) {
       const texto = msgConvite(nome, vai, acompanhantes);
-      // WhatsApp
       btnWhats.onclick = () => {
         const url = `https://wa.me/?text=${encodeURIComponent(texto)}`;
         window.open(url, '_blank');
       };
-      // E-mail
       btnMail.onclick = () => {
         const assunto = `Confirmação — Churrasco da Fer`;
         const mailto = `mailto:?subject=${encodeURIComponent(assunto)}&body=${encodeURIComponent(texto)}`;
