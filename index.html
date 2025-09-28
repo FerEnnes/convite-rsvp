@@ -152,11 +152,16 @@ ${nome}: ${presenca}
 Obs.: opções vegetarianas garantidas 🌽🥖🥗${lembrete}`;
     }
 
-    async function enviar(payload) {
-      const body = new URLSearchParams({ data: JSON.stringify(payload) });
-      const res = await fetch(SCRIPT_URL, { method: 'POST', body });
-      return res.json();
-    }
+   async function enviar(payload) {
+  const body = new URLSearchParams({ data: JSON.stringify(payload) });
+  const res = await fetch(SCRIPT_URL, {
+    method: 'POST',
+    body
+  });
+  return res.json();
+}git add .
+git commit -m "fix: corrigido parse de JSON/URL-encoded no App Script e mantido envio URLSearchParams no front"
+git push
 
     const form = document.getElementById('rsvp');
     const msg = document.getElementById('msg');
