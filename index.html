@@ -85,7 +85,8 @@
         <h2>Confirmar presença</h2>
         <p class="muted">Preencha para eu organizar comida e bebida 🙂</p>
 
-        <form id="rsvp" class="row" autocomplete="on">
+        <!-- AJUSTE AQUI -->
+        <form id="rsvp" class="row" autocomplete="on" method="post" action="javascript:void(0)">
           <div><label>Nome*</label><input type="text" name="nome" required /></div>
           <div>
             <label>Você vai?*</label>
@@ -136,7 +137,7 @@
 ${ENDERECO_COMPLETO}
 Mapa: ${MAPS_URL}
 Salão de festas (interfone 100)`;
-      const contato = `Tel.: 47 9 9786-5133`;
+      const contato = `Tel.: 47 99786-5133`;
       const presenca = vai === 'sim'
         ? `Presença confirmada${Number(acompanhantes||0) > 0 ? ` (+${acompanhantes})` : ''}!`
         : `Não poderei ir.`;
@@ -152,16 +153,11 @@ ${nome}: ${presenca}
 Obs.: opções vegetarianas garantidas 🌽🥖🥗${lembrete}`;
     }
 
-   async function enviar(payload) {
-  const body = new URLSearchParams({ data: JSON.stringify(payload) });
-  const res = await fetch(SCRIPT_URL, {
-    method: 'POST',
-    body
-  });
-  return res.json();
-}git add .
-git commit -m "fix: corrigido parse de JSON/URL-encoded no App Script e mantido envio URLSearchParams no front"
-git push
+    async function enviar(payload) {
+      const body = new URLSearchParams({ data: JSON.stringify(payload) });
+      const res = await fetch(SCRIPT_URL, { method: 'POST', body });
+      return res.json();
+    }
 
     const form = document.getElementById('rsvp');
     const msg = document.getElementById('msg');
@@ -173,7 +169,10 @@ git push
     function setupShare(nome, vai, acompanhantes) {
       const texto = msgConvite(nome, vai, acompanhantes);
       btnWhats.onclick = () => window.open(`https://wa.me/?text=${encodeURIComponent(texto)}`, '_blank');
-      btnMail.onclick = () => { const assunto = `Confirmação — Churrasco da Fer`; window.location.href = `mailto:?subject=${encodeURIComponent(assunto)}&body=${encodeURIComponent(texto)}`; };
+      btnMail.onclick = () => {
+        const assunto = `Confirmação — Churrasco da Fer`;
+        window.location.href = `mailto:?subject=${encodeURIComponent(assunto)}&body=${encodeURIComponent(texto)}`;
+      };
       share.style.display = 'grid';
     }
 
@@ -183,9 +182,19 @@ git push
       try {
         msg.className = 'msg'; msg.textContent = 'Enviando...';
         const out = await enviar(data);
-        if (out.ok) { msg.className = 'msg oktxt'; msg.textContent = 'Confirmado! Obrigada 💚'; setupShare(data.nome?.trim() || 'Convidado(a)', data.vai, data.acompanhantes); form.reset(); }
-        else { msg.className = 'msg errtxt'; msg.textContent = `Erro: ${out.error || 'Falha ao enviar'}`; }
-      } catch { msg.className = 'msg errtxt'; msg.textContent = 'Falha ao enviar. Tenta de novo.'; }
+        if (out.ok) {
+          msg.className = 'msg oktxt';
+          msg.textContent = 'Confirmado! Obrigada 💚';
+          setupShare(data.nome?.trim() || 'Convidado(a)', data.vai, data.acompanhantes);
+          form.reset();
+        } else {
+          msg.className = 'msg errtxt';
+          msg.textContent = `Erro: ${out.error || 'Falha ao enviar'}`;
+        }
+      } catch {
+        msg.className = 'msg errtxt';
+        msg.textContent = 'Falha ao enviar. Tenta de novo.';
+      }
     });
 
     btnNao.addEventListener('click', async () => {
@@ -193,8 +202,15 @@ git push
       if (!nome) { msg.className='msg errtxt'; msg.textContent = 'Informe seu nome para registrar o “não vou”.'; return; }
       msg.className='msg'; msg.textContent = 'Enviando...';
       const out = await enviar({ nome, vai: 'nao', acompanhantes: 0 });
-      if (out.ok) { msg.className='msg oktxt'; msg.textContent = 'Resposta registrada. Obrigada por avisar!'; setupShare(nome, 'nao', 0); form.reset(); }
-      else { msg.className='msg errtxt'; msg.textContent = `Erro: ${out.error || 'Falha ao enviar'}`; }
+      if (out.ok) {
+        msg.className='msg oktxt';
+        msg.textContent = 'Resposta registrada. Obrigada por avisar!';
+        setupShare(nome, 'nao', 0);
+        form.reset();
+      } else {
+        msg.className='msg errtxt';
+        msg.textContent = `Erro: ${out.error || 'Falha ao enviar'}`;
+      }
     });
   </script>
 </body>
