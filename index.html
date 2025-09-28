@@ -85,8 +85,7 @@
         <h2>Confirmar presença</h2>
         <p class="muted">Preencha para eu organizar comida e bebida 🙂</p>
 
-        <!-- AJUSTE AQUI -->
-        <form id="rsvp" class="row" autocomplete="on" method="post" action="javascript:void(0)">
+        <form id="rsvp" class="row" autocomplete="on">
           <div><label>Nome*</label><input type="text" name="nome" required /></div>
           <div>
             <label>Você vai?*</label>
@@ -137,7 +136,7 @@
 ${ENDERECO_COMPLETO}
 Mapa: ${MAPS_URL}
 Salão de festas (interfone 100)`;
-      const contato = `Tel.: 47 99786-5133`;
+      const contato = `Tel.: 47 9 9786-5133`;
       const presenca = vai === 'sim'
         ? `Presença confirmada${Number(acompanhantes||0) > 0 ? ` (+${acompanhantes})` : ''}!`
         : `Não poderei ir.`;
@@ -155,7 +154,11 @@ Obs.: opções vegetarianas garantidas 🌽🥖🥗${lembrete}`;
 
     async function enviar(payload) {
       const body = new URLSearchParams({ data: JSON.stringify(payload) });
-      const res = await fetch(SCRIPT_URL, { method: 'POST', body });
+      const res = await fetch(SCRIPT_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body
+      });
       return res.json();
     }
 
@@ -203,13 +206,11 @@ Obs.: opções vegetarianas garantidas 🌽🥖🥗${lembrete}`;
       msg.className='msg'; msg.textContent = 'Enviando...';
       const out = await enviar({ nome, vai: 'nao', acompanhantes: 0 });
       if (out.ok) {
-        msg.className='msg oktxt';
-        msg.textContent = 'Resposta registrada. Obrigada por avisar!';
+        msg.className='msg oktxt'; msg.textContent = 'Resposta registrada. Obrigada por avisar!';
         setupShare(nome, 'nao', 0);
         form.reset();
       } else {
-        msg.className='msg errtxt';
-        msg.textContent = `Erro: ${out.error || 'Falha ao enviar'}`;
+        msg.className='msg errtxt'; msg.textContent = `Erro: ${out.error || 'Falha ao enviar'}`;
       }
     });
   </script>
