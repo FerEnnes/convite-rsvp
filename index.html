@@ -117,7 +117,8 @@
   </div>
 
   <script>
-    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwVtMDkU1zA2jjsYmueA1No-wej944qJP6Oqf4VEj9yZ46MkWXYpHs9YkiYo6_EXeVZ/exec';
+    // NOVA URL (Versão 3)
+    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwCkgmewVzPahDOQwtgeaLs0ToXWCKrUWzkrcYOOoafxZ6PF3zHE16Pi1CEXWI-or5R/exec';
 
     const DATA_EVENTO = 'Sexta, 03/10/2025';
     const HORA_EVENTO = 'a partir das 18h30';
@@ -155,26 +156,31 @@ ${nome}: ${presenca}
 Obs.: opções vegetarianas garantidas 🌽🥖🥗${lembrete}`;
     }
 
+    // POST como x-www-form-urlencoded (sem preflight) + leitura defensiva
     async function enviar(payload) {
-      // Envia como x-www-form-urlencoded: evita preflight/CORS
       const body = new URLSearchParams({ data: JSON.stringify(payload) });
-      const res = await fetch(SCRIPT_URL, { method: 'POST', body });
-      const text = await res.text();           // leitura defensiva
-      try { return JSON.parse(text); }         // tenta JSON
+      const res  = await fetch(SCRIPT_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8' },
+        body,
+        cache: 'no-cache'
+      });
+      const text = await res.text();
+      try { return JSON.parse(text); }
       catch { return { ok:false, error:`Resposta não-JSON: ${text.slice(0,120)}...` }; }
     }
 
-    const form = document.getElementById('rsvp');
-    const msg = document.getElementById('msg');
-    const btnNao = document.getElementById('btn-nao');
-    const share = document.getElementById('share');
-    const btnWhats = document.getElementById('whats');
+    const form    = document.getElementById('rsvp');
+    const msg     = document.getElementById('msg');
+    const btnNao  = document.getElementById('btn-nao');
+    const share   = document.getElementById('share');
+    const btnWhats= document.getElementById('whats');
     const btnMail = document.getElementById('mail');
 
     function setupShare(nome, vai, acompanhantes) {
       const texto = msgConvite(nome, vai, acompanhantes);
       btnWhats.onclick = () => window.open(`https://wa.me/?text=${encodeURIComponent(texto)}`, '_blank');
-      btnMail.onclick = () => {
+      btnMail.onclick  = () => {
         const assunto = `Confirmação — Churrasco da Fer`;
         window.location.href = `mailto:?subject=${encodeURIComponent(assunto)}&body=${encodeURIComponent(texto)}`;
       };
